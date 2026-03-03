@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+
+# Build/artifact folders
+build/
+dist/
+*.egg-info/
+
+# OS/editor files
+.DS_Store
+.vscode/
+
+# Optional generated outputs (uncomment if you don't want to commit these)
+# benchmark_performance.png
