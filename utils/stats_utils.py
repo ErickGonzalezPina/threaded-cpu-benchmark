@@ -23,12 +23,13 @@ def standard_deviation(values: list[float]) -> float:
     return math.sqrt(variance)
 
 
-def statistics_calculator(worker, thread_count: int, duration_seconds: float) -> tuple[list[float], float, float]:
+def statistics_calculator(worker, worker_count: int, duration_seconds: float, manager) -> tuple[list[float], float, float]:
     '''Run one benchmark configuration 3 times and return runs, average, and standard deviation.'''
+    
     ops_per_second_runs = []
 
     for _ in range(3):
-        _, _, ops_per_second = threads_manager(worker, thread_count, duration_seconds)
+        _, _, ops_per_second = manager(worker, worker_count, duration_seconds)
         ops_per_second_runs.append(ops_per_second)
 
     avg_ops_per_second = average(ops_per_second_runs)
