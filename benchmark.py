@@ -222,23 +222,17 @@ def threaded_vs_processes_benchmark(duration_seconds: float, worker_counts: list
         process_float_sd_gflops=process_float_sd,
     )
 
-    # Use the last worker-count point (largest configured worker count)
-    # to summarize head-to-head throughput gains.
+    # Integer throughput Gains
     threaded_integer_last = threaded_integer_avg[-1]
     process_integer_last = process_integer_avg[-1]
-
-    # Percent gain formula:
-    # ((process - threaded) / threaded) * 100
-    # Positive => process is faster, negative => threaded is faster.
+    # Percent gain formula: ((process - threaded) / threaded) * 100
     iops_gain_pct = ((process_integer_last - threaded_integer_last) / threaded_integer_last) * 100
-
-    # Multiplicative speedup ("x" factor):
-    # process / threaded (for example, 1.25x means 25% faster).
     iops_scale = process_integer_last / threaded_integer_last
 
-    # Repeat the same calculations for floating-point throughput.
+    # Floating-point throughput Gains
     threaded_float_last = threaded_float_avg[-1]
     process_float_last = process_float_avg[-1]
+    # Percent gain formula: ((process - threaded) / threaded) * 100
     flops_gain_pct = ((process_float_last - threaded_float_last) / threaded_float_last) * 100
     flops_scale = process_float_last / threaded_float_last
 
