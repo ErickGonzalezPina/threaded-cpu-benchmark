@@ -1,25 +1,32 @@
-# Python Threaded CPU Benchmark (IOPS/FLOPS)
+# Python CPU Benchmark (Threaded + Process)
 
-This project benchmarks CPU throughput in Python using threads for:
-- Integer operations (`IOPS` / `GIOPS`)
-- Floating-point operations (`FLOPS` / `GFLOPS`)
+This project benchmarks CPU throughput in Python for CPU-bound integer and floating-point workloads using:
 
-For each thread configuration, the benchmark runs 3 trials and reports:
-- Per-run throughput
-- Average throughput
-- Sample standard deviation
+- `threaded` mode (threads)
+- `process` mode (multiprocessing)
+- `both` mode (threaded + process comparison in one run)
 
-It also generates a comparison graph with error bars.
+For each worker count, the benchmark runs 3 trials and reports:
+
+- per-run throughput
+- average throughput
+- sample standard deviation
+
+Throughput is shown as:
+
+- integer: `IOPS` and `GIOPS`
+- float: `FLOPS` and `GFLOPS`
 
 ## Project Structure
 
 - `benchmark.py` - CLI entrypoint and benchmark orchestration
-- `utils/cli_utils.py` - CLI parsing helpers (`parse_thread_counts`, `normalize_output_file`)
-- `utils/stats_utils.py` - statistics helpers and 3-run calculation
-- `utils/threads_utils.py` - integer/float workers and thread manager
-- `utils/plot_utils.py` - graph generation
-- `tests/test_benchmark_utils.py` - unit tests for utilities
-- `tests/test_benchmark_cli.py` - CLI smoke test
+- `utils/cli_utils.py` - CLI parsing/path normalization helpers
+- `utils/stats_utils.py` - average, sample standard deviation, and 3-run stats aggregation
+- `utils/threads_utils.py` - thread workers and thread manager
+- `utils/processes_utils.py` - process workers and process manager
+- `utils/plot_utils.py` - graph generation (single-mode and threaded-vs-process comparison)
+- `tests/test_benchmark_utils.py` - utility tests (stats, CLI helpers, workers/managers)
+- `tests/test_benchmark_cli.py` - CLI smoke tests per mode (`threaded`, `process`, `both`)
 
 ## Setup
 
@@ -33,49 +40,78 @@ source .venv/bin/activate
 ### 2) Install dependencies
 
 ```bash
-pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-## Run from CLI
+## CLI Usage
 
-Run benchmark with default arguments:
+### Default run
 
 ```bash
-python3 benchmark.py
+.venv/bin/python benchmark.py
 ```
 
-Example with a custom arguments:
+### Arguments
+
+- `--duration-seconds` (float, default: `3.0`)
+- `--worker-counts` (comma-separated ints, default: `1,2,4,8`)
+- `--output-file` (default: `benchmarks/benchmark_performance.png`)
+- `--mode` (`threaded`, `process`, `both`; default: `threaded`)
+
+### Examples
+
+Run threaded mode:
 
 ```bash
-python3 benchmark.py --duration-seconds 5 --thread-counts 1,3,5,7 --output-file benchmarks/myGraph
+.venv/bin/python benchmark.py --mode threaded --duration-seconds 5 --worker-counts 1,2,4,8 --output-file benchmarks/threaded.png
 ```
+
+Run process mode:
+
+```bash
+.venv/bin/python benchmark.py --mode process --duration-seconds 5 --worker-counts 1,2,4,8 --output-file benchmarks/process.png
+```
+
+Run threaded vs process comparison:
+
+```bash
+.venv/bin/python benchmark.py --mode both --duration-seconds 1 --worker-counts 1,2,4,8 --output-file benchmarks/benchmark_process_vs_thread.png
+```
+
+## Output Behavior by Mode
+
+- `threaded`: prints threaded integer/float benchmark stats and saves a 2-series graph.
+- `process`: prints process integer/float benchmark stats and saves a 2-series graph.
+- `both`: runs both backends, saves a 4-series comparison graph, and prints:
+  - IOPS gain at the largest worker count (`process vs threaded`)
+  - FLOPS gain at the largest worker count (`process vs threaded`)
 
 ## Sample Output Graph
 
-![Benchmark performance graph](benchmarks/benchmark_performance.png)
+![Benchmark performance graph](benchmarks/benchmark_process_vs_thread.png)
 
 ## Run Tests
 
 Run utility tests:
 
 ```bash
-python3 -m unittest tests.test_benchmark_utils -v
+.venv/bin/python -m unittest tests.test_benchmark_utils -v
 ```
 
-Run CLI smoke test:
+Run CLI smoke tests:
 
 ```bash
-python3 -m unittest tests.test_benchmark_cli -v
+.venv/bin/python -m unittest tests.test_benchmark_cli -v
 ```
 
 Run full test discovery:
 
 ```bash
-python3 -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
 ## Notes
 
-- The benchmark uses CPython threads for CPU-bound work.
-- Because of the GIL, scaling with more threads may look flat.
+- CPython threads are constrained by the GIL for CPU-bound workloads.
+- `process` and `both` modes are included for direct scaling/performance comparison against threads.
 
