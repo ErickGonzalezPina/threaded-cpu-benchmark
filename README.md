@@ -30,6 +30,26 @@ Throughput is shown as:
 
 ## Setup
 
+### Quick setup script
+
+macOS/Linux:
+
+```bash
+./setup.sh
+```
+
+If you want the script to also activate the environment in your current shell, source it:
+
+```bash
+source ./setup.sh
+```
+
+Windows (Command Prompt):
+
+```bat
+setup.bat
+```
+
 ### 1) Create and activate virtual environment
 
 ```bash
